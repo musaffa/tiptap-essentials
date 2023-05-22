@@ -207,7 +207,9 @@ export const TiptapEssentials = Extension.create({
 
     if (this.options.textAlign !== false) {
       extensions.push(TextAlign.configure({
-        types: ['heading', 'paragraph']
+        types: ['heading', 'paragraph'],
+        alignments: ['start', 'end', 'left', 'center', 'right', 'justify'],
+        defaultAlignment: 'start'
       }))
     }
 
