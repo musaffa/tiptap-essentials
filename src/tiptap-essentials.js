@@ -180,6 +180,13 @@ export const TiptapEssentials = Extension.create({
 
     if (this.options.table !== false) {
       extensions.push(Table.extend({
+        renderHTML({ HTMLAttributes }) {
+          return [
+            'div',
+            { class: 'table-responsive' },
+            ['table', HTMLAttributes, ['tbody', 0]]
+          ];
+        },
         addAttributes() {
           return {
             ...this.parent?.(),
