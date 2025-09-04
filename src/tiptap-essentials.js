@@ -148,7 +148,8 @@ export const TiptapEssentials = Extension.create({
         addAttributes() {
           return {
             ...this.parent(),
-            title: { default: null }
+            title: { default: null },
+            class: { default: 'tiptap-link' }
           };
         }
       }))
