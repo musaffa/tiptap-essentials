@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
-import { video } from './samples.js';
-import { edit } from './test/edit.js';
+import { video } from '../src/samples.js';
+import { edit } from './support/edit.js';
 
 const ATTACK = '<img src=x onerror="alert(1)">';
 

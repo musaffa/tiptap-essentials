@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'vitest';
-import { table } from './samples.js';
-import { TiptapEssentials } from './tiptap-essentials.js';
-import { edit } from './test/edit.js';
+import { table } from '../src/samples.js';
+import { TiptapEssentials } from '../src/tiptap-essentials.js';
+import { edit } from './support/edit.js';
 
 describe('table', () => {
   test('reads a table in its region back and writes it out as it came', () => {

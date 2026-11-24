@@ -1,5 +1,5 @@
 import { Editor, type AnyExtension } from '@tiptap/core';
-import { TiptapEssentials } from '../tiptap-essentials.js';
+import { TiptapEssentials } from '../../src/tiptap-essentials.js';
 
 /** An editor of the library's parts, drawn into an element of its own. */
 export function edit(

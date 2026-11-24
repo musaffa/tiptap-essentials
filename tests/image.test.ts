@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
-import { picture } from './samples.js';
-import { edit } from './test/edit.js';
+import { picture } from '../src/samples.js';
+import { edit } from './support/edit.js';
 
 describe('image', () => {
   test('reads a picture back and writes it out as it came', () => {

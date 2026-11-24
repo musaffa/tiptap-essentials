@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { edit } from './test/edit.js';
+import { edit } from './support/edit.js';
 
 describe('plain spaces', () => {
   test('reads a no-break space pasted as text as a space', () => {

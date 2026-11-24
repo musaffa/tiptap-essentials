@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
-import { TiptapEssentials } from './tiptap-essentials.js';
-import { edit } from './test/edit.js';
+import { TiptapEssentials } from '../src/tiptap-essentials.js';
+import { edit } from './support/edit.js';
 
 describe('TiptapEssentials', () => {
   test('leaves out a part whose option is false', () => {

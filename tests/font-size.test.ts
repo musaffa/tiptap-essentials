@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
-import { size } from './samples.js';
-import { edit } from './test/edit.js';
+import { size } from '../src/samples.js';
+import { edit } from './support/edit.js';
 
 describe('font size', () => {
   test('reads a size back and writes it out as it came', () => {
