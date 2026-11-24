@@ -1,7 +1,8 @@
 import {
   FontSize as TiptapFontSize,
-  TextStyle as TiptapTextStyle
+  type FontSizeOptions as TiptapFontSizeOptions
 } from '@tiptap/extension-text-style';
+import { ifListed } from './listed.js';
 
 // 1.x wrote a size as a span of one of these classes, each standing for one
 // of the site's size properties.
@@ -17,23 +18,30 @@ function classSize(element: HTMLElement) {
   return name ? CLASS_SIZES[name] : null;
 }
 
-/** Tiptap's text style, reading a span 1.x sized by its class as styled. */
-export const TextStyle = TiptapTextStyle.extend({
-  parseHTML() {
-    return [
-      ...(this.parent?.() ?? []),
-      {
-        tag: 'span',
-        consuming: false,
-        getAttrs: (element) => (classSize(element) ? {} : false)
-      }
-    ];
-  }
-});
+export interface FontSizeOptions extends TiptapFontSizeOptions {
+  /**
+   * The sizes a text may take, as a body writes them: `var(--lg-font-size)`.
+   * Any where null.
+   */
+  fontSizes: string[] | null;
+}
 
-/** Tiptap's font size, reading 1.x's size classes as the sizes they stood for. */
-export const FontSize = TiptapFontSize.extend({
+/**
+ * Tiptap's font size, held to a set of sizes, and reading 1.x's size classes
+ * as the sizes they stood for: a size pasted in that is not one of the set is
+ * read as none, and none is set.
+ */
+export const FontSize = TiptapFontSize.extend<FontSizeOptions>({
+  addOptions() {
+    return {
+      ...this.parent!(),
+      fontSizes: null
+    };
+  },
+
   addGlobalAttributes() {
+    const { fontSizes } = this.options;
+
     return (this.parent?.() ?? []).map(({ types, attributes }) => {
       const { fontSize } = attributes;
       return {
@@ -42,10 +50,24 @@ export const FontSize = TiptapFontSize.extend({
           fontSize: {
             ...fontSize,
             parseHTML: (element: HTMLElement) =>
-              fontSize?.parseHTML?.(element) || classSize(element)
+              ifListed(
+                fontSize?.parseHTML?.(element) || classSize(element),
+                fontSizes
+              )
           }
         }
       };
     });
+  },
+
+  addCommands() {
+    const commands = this.parent!();
+
+    return {
+      ...commands,
+      setFontSize: (fontSize) => (props) =>
+        ifListed(fontSize, this.options.fontSizes) !== null &&
+        commands.setFontSize!(fontSize)(props)
+    };
   }
 });

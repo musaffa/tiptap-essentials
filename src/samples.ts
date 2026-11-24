@@ -23,3 +23,14 @@ export const video =
 
 export const size =
   '<p><span style="font-size: var(--lg-font-size);">Large</span> text</p>';
+
+export const color =
+  '<p><span style="color: var(--tiptap-text-red);">Red</span> text</p>';
+
+export const highlight =
+  '<p><mark data-color="var(--tiptap-highlight-yellow)" ' +
+  'style="background-color: var(--tiptap-highlight-yellow); color: inherit;">Marked</mark> text</p>';
+
+export const spacing =
+  '<p style="line-height: var(--tiptap-line-height-150); margin-top: var(--space-40); ' +
+  'margin-bottom: var(--space-40);">Spaced</p>';

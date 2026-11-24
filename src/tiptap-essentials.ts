@@ -6,17 +6,20 @@ import Superscript, {
 import { TableKit, type TableKitOptions } from '@tiptap/extension-table';
 import TextAlign, { type TextAlignOptions } from '@tiptap/extension-text-align';
 import {
-  TextStyle as TiptapTextStyle,
   TextStyleKit,
-  type FontSizeOptions,
   type TextStyleKitOptions
 } from '@tiptap/extension-text-style';
 import type { YoutubeOptions } from '@tiptap/extension-youtube';
 import StarterKit, { type StarterKitOptions } from '@tiptap/starter-kit';
-import { FontSize, TextStyle } from './font-size.js';
+import { BlockSpacing, type BlockSpacingOptions } from './block-spacing.js';
+import { Color, type ColorOptions } from './color.js';
+import { FontSize, type FontSizeOptions } from './font-size.js';
+import { Highlight, type HighlightOptions } from './highlight.js';
 import { Image } from './image.js';
+import { LineHeight, type LineHeightOptions } from './line-height.js';
 import { PlainSpaces } from './plain-spaces.js';
 import { Table, type TableOptions } from './table.js';
+import { TextStyle } from './text-style.js';
 import { Youtube } from './youtube.js';
 
 type Part<Options> = Partial<Options> | false;
@@ -27,12 +30,21 @@ export interface TiptapEssentialsOptions {
   tableKit:
     | (Partial<Omit<TableKitOptions, 'table'>> & { table?: Part<TableOptions> })
     | false;
-  /** TextStyleKit's options, its font size being the library's. */
+  /**
+   * TextStyleKit's options, its text style, font size, colour and line height
+   * being the library's.
+   */
   textStyleKit:
-    | (Partial<Omit<TextStyleKitOptions, 'fontSize'>> & {
+    | (Partial<
+        Omit<TextStyleKitOptions, 'fontSize' | 'color' | 'lineHeight'>
+      > & {
         fontSize?: Part<FontSizeOptions>;
+        color?: Part<ColorOptions>;
+        lineHeight?: Part<LineHeightOptions>;
       })
     | false;
+  highlight: Part<HighlightOptions>;
+  blockSpacing: Part<BlockSpacingOptions>;
   textAlign: Part<TextAlignOptions>;
   superscript: Part<SuperscriptExtensionOptions>;
   image: Part<ImageOptions>;
@@ -56,6 +68,8 @@ export const TiptapEssentials = Extension.create<TiptapEssentialsOptions>({
         types: ['heading', 'paragraph'],
         alignments: ['start', 'end', 'left', 'center', 'right', 'justify']
       },
+      highlight: {},
+      blockSpacing: {},
       superscript: {},
       image: {},
       youtube: {},
@@ -68,6 +82,8 @@ export const TiptapEssentials = Extension.create<TiptapEssentialsOptions>({
       starterKit,
       tableKit,
       textStyleKit,
+      highlight,
+      blockSpacing,
       textAlign,
       superscript,
       image,
@@ -89,18 +105,42 @@ export const TiptapEssentials = Extension.create<TiptapEssentialsOptions>({
     }
 
     if (textStyleKit !== false) {
-      const { fontSize = {}, textStyle = {}, ...rest } = textStyleKit;
+      const {
+        fontSize = {},
+        color = {},
+        lineHeight = {},
+        textStyle = {},
+        ...rest
+      } = textStyleKit;
       extensions.push(
-        TextStyleKit.configure({ ...rest, fontSize: false, textStyle: false })
+        TextStyleKit.configure({
+          ...rest,
+          fontSize: false,
+          color: false,
+          lineHeight: false,
+          textStyle: false
+        })
       );
       if (textStyle !== false) {
-        // A span 1.x sized is read as styled only where its size is kept.
-        const style = fontSize === false ? TiptapTextStyle : TextStyle;
-        extensions.push(style.configure(textStyle));
+        extensions.push(TextStyle.configure(textStyle));
       }
       if (fontSize !== false) {
         extensions.push(FontSize.configure(fontSize));
       }
+      if (color !== false) {
+        extensions.push(Color.configure(color));
+      }
+      if (lineHeight !== false) {
+        extensions.push(LineHeight.configure(lineHeight));
+      }
+    }
+
+    if (highlight !== false) {
+      extensions.push(Highlight.configure(highlight));
+    }
+
+    if (blockSpacing !== false) {
+      extensions.push(BlockSpacing.configure(blockSpacing));
     }
 
     if (textAlign !== false) {

@@ -15,6 +15,22 @@ describe('font size', () => {
     expect(html).toBe(size);
   });
 
+  test('reads a size off its list as none', () => {
+    const html = edit(
+      '<p><span style="font-size: 11pt">Large</span> text</p>'
+    ).getHTML();
+
+    expect(html).toBe('<p>Large text</p>');
+  });
+
+  test('sets no size off its list', () => {
+    const editor = edit('<p>Large text</p>');
+    editor.commands.setTextSelection({ from: 1, to: 6 });
+
+    expect(editor.commands.setFontSize('11pt')).toBe(false);
+    expect(editor.getHTML()).toBe('<p>Large text</p>');
+  });
+
   test('reads a span of any other class as its text', () => {
     const html = edit(
       '<p><span class="tiptap-image-caption">A</span> b</p>'
