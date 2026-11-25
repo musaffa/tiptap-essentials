@@ -13,6 +13,8 @@ export type { ImageAttributes, PictureSource } from './image.js';
 export { LineHeight } from './line-height.js';
 export type { LineHeightOptions } from './line-height.js';
 export { PlainSpaces } from './plain-spaces.js';
+export { Subscript } from './subscript.js';
+export { Superscript } from './superscript.js';
 export { Table } from './table.js';
 export type { TableOptions } from './table.js';
 export { TextStyle } from './text-style.js';

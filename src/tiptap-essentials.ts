@@ -1,8 +1,7 @@
 import { Extension, type AnyExtension } from '@tiptap/core';
 import type { ImageOptions } from '@tiptap/extension-image';
-import Superscript, {
-  type SuperscriptExtensionOptions
-} from '@tiptap/extension-superscript';
+import type { SubscriptExtensionOptions } from '@tiptap/extension-subscript';
+import type { SuperscriptExtensionOptions } from '@tiptap/extension-superscript';
 import { TableKit, type TableKitOptions } from '@tiptap/extension-table';
 import TextAlign, { type TextAlignOptions } from '@tiptap/extension-text-align';
 import {
@@ -18,6 +17,8 @@ import { Highlight, type HighlightOptions } from './highlight.js';
 import { Image } from './image.js';
 import { LineHeight, type LineHeightOptions } from './line-height.js';
 import { PlainSpaces } from './plain-spaces.js';
+import { Subscript } from './subscript.js';
+import { Superscript } from './superscript.js';
 import { Table, type TableOptions } from './table.js';
 import { TextStyle } from './text-style.js';
 import { Youtube } from './youtube.js';
@@ -47,6 +48,7 @@ export interface TiptapEssentialsOptions {
   blockSpacing: Part<BlockSpacingOptions>;
   textAlign: Part<TextAlignOptions>;
   superscript: Part<SuperscriptExtensionOptions>;
+  subscript: Part<SubscriptExtensionOptions>;
   image: Part<ImageOptions>;
   youtube: Part<YoutubeOptions>;
   plainSpaces: Record<string, never> | false;
@@ -71,6 +73,7 @@ export const TiptapEssentials = Extension.create<TiptapEssentialsOptions>({
       highlight: {},
       blockSpacing: {},
       superscript: {},
+      subscript: {},
       image: {},
       youtube: {},
       plainSpaces: {}
@@ -86,6 +89,7 @@ export const TiptapEssentials = Extension.create<TiptapEssentialsOptions>({
       blockSpacing,
       textAlign,
       superscript,
+      subscript,
       image,
       youtube,
       plainSpaces
@@ -149,6 +153,10 @@ export const TiptapEssentials = Extension.create<TiptapEssentialsOptions>({
 
     if (superscript !== false) {
       extensions.push(Superscript.configure(superscript));
+    }
+
+    if (subscript !== false) {
+      extensions.push(Subscript.configure(subscript));
     }
 
     if (image !== false) {

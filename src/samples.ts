@@ -34,3 +34,5 @@ export const highlight =
 export const spacing =
   '<p style="line-height: var(--tiptap-line-height-150); margin-top: var(--space-40); ' +
   'margin-bottom: var(--space-40);">Spaced</p>';
+
+export const subscript = '<p>H<sub>2</sub>O</p>';

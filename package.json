@@ -1,6 +1,6 @@
 {
   "name": "tiptap-essentials",
-  "version": "2.0.0-beta.3",
+  "version": "2.0.0-beta.4",
   "description": "Essential extensions of Tiptap",
   "type": "module",
   "exports": {
@@ -35,6 +35,7 @@
   "dependencies": {
     "@tiptap/extension-highlight": "^3.35.0",
     "@tiptap/extension-image": "^3.35.0",
+    "@tiptap/extension-subscript": "^3.35.0",
     "@tiptap/extension-superscript": "^3.35.0",
     "@tiptap/extension-table": "^3.35.0",
     "@tiptap/extension-text-align": "^3.35.0",
