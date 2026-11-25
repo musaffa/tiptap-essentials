@@ -3,8 +3,9 @@ import { TiptapEssentials } from '../../src/tiptap-essentials.js';
 
 /**
  * An editor of the library's parts, drawn into an element of its own and
- * configured as a site would be: its tables named, and its palettes and steps
- * holding the values the samples write.
+ * configured as a site would be: its tables named, its palettes and steps
+ * holding the values the samples write, and its images served from the host
+ * they name.
  */
 export function edit(
   content: string,
@@ -19,7 +20,8 @@ export function edit(
       colors: ['var(--tiptap-highlight-yellow)'],
       defaultColor: 'var(--tiptap-highlight-yellow)'
     },
-    blockSpacing: { space: 'var(--space-40)' }
+    blockSpacing: { space: 'var(--space-40)' },
+    image: { host: 'https://static.example' }
   })
 ) {
   return new Editor({

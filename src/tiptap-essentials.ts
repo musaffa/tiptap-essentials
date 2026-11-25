@@ -1,5 +1,4 @@
 import { Extension, type AnyExtension } from '@tiptap/core';
-import type { ImageOptions } from '@tiptap/extension-image';
 import type { SubscriptExtensionOptions } from '@tiptap/extension-subscript';
 import type { SuperscriptExtensionOptions } from '@tiptap/extension-superscript';
 import { TableKit, type TableKitOptions } from '@tiptap/extension-table';
@@ -14,7 +13,7 @@ import { BlockSpacing, type BlockSpacingOptions } from './block-spacing.js';
 import { Color, type ColorOptions } from './color.js';
 import { FontSize, type FontSizeOptions } from './font-size.js';
 import { Highlight, type HighlightOptions } from './highlight.js';
-import { Image } from './image.js';
+import { Image, type ImageOptions } from './image.js';
 import { LineHeight, type LineHeightOptions } from './line-height.js';
 import { PlainSpaces } from './plain-spaces.js';
 import { Subscript } from './subscript.js';

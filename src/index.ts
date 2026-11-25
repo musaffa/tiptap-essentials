@@ -9,7 +9,11 @@ export type { FontSizeOptions } from './font-size.js';
 export { Highlight } from './highlight.js';
 export type { HighlightOptions } from './highlight.js';
 export { Image } from './image.js';
-export type { ImageAttributes, PictureSource } from './image.js';
+export type {
+  ImageAttributes,
+  ImageOptions,
+  PictureSource
+} from './image.js';
 export { LineHeight } from './line-height.js';
 export type { LineHeightOptions } from './line-height.js';
 export { PlainSpaces } from './plain-spaces.js';
