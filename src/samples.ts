@@ -17,6 +17,13 @@ export const table =
   '<tr><td><p>Chattogram</p></td><td><p>12</p></td></tr>' +
   '</tbody></table></div>';
 
+export const captionedTable =
+  '<div class="table-responsive" role="region" tabindex="0" aria-label="Ships by port">' +
+  '<table class="tiptap-table"><caption>Ships by port</caption><tbody>' +
+  '<tr><th><p>Port</p></th><th><p>Ships</p></th></tr>' +
+  '<tr><td><p>Chattogram</p></td><td><p>12</p></td></tr>' +
+  '</tbody></table></div>';
+
 export const video =
   '<div data-youtube-video=""><iframe width="640" height="480" allowfullscreen="true" ' +
   'src="https://www.youtube.com/embed/M7lc1UVf-VE?start=90&amp;rel=1" title="A talk"></iframe></div>';
