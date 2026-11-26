@@ -10,18 +10,28 @@ export const picture =
   'srcset="https://static.example/uploads/store/photo-300.jpg 300w" sizes="auto" loading="lazy" ' +
   'style="width: 100%; aspect-ratio: 3 / 2;"></picture>';
 
+// A table no line has moved, its columns at even shares.
 export const table =
   '<div class="table-responsive" role="region" tabindex="0" aria-label="Table">' +
-  '<table class="tiptap-table"><tbody>' +
+  '<table class="tiptap-table"><colgroup><col style="--tiptap-column-width: 50%;"><col style="--tiptap-column-width: 50%;"></colgroup><tbody>' +
   '<tr><th><p>Port</p></th><th><p>Ships</p></th></tr>' +
   '<tr><td><p>Chattogram</p></td><td><p>12</p></td></tr>' +
   '</tbody></table></div>';
 
 export const captionedTable =
   '<div class="table-responsive" role="region" tabindex="0" aria-label="Ships by port">' +
-  '<table class="tiptap-table"><caption>Ships by port</caption><tbody>' +
+  '<table class="tiptap-table"><caption>Ships by port</caption>' +
+  '<colgroup><col style="--tiptap-column-width: 50%;"><col style="--tiptap-column-width: 50%;"></colgroup><tbody>' +
   '<tr><th><p>Port</p></th><th><p>Ships</p></th></tr>' +
   '<tr><td><p>Chattogram</p></td><td><p>12</p></td></tr>' +
+  '</tbody></table></div>';
+
+// A table whose lines have moved, a row given a height and a cell a colour.
+export const styledTable =
+  '<div class="table-responsive" role="region" tabindex="0" aria-label="Table">' +
+  '<table class="tiptap-table"><colgroup><col style="--tiptap-column-width: 30.5%;"><col style="--tiptap-column-width: 69.5%;"></colgroup><tbody>' +
+  '<tr><th><p>Port</p></th><th><p>Ships</p></th></tr>' +
+  '<tr style="--tiptap-row-height: 2.5em;"><td style="background-color: var(--tiptap-highlight-yellow);"><p>Chattogram</p></td><td><p>12</p></td></tr>' +
   '</tbody></table></div>';
 
 export const video =

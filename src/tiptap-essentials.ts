@@ -19,6 +19,7 @@ import { PlainSpaces } from './plain-spaces.js';
 import { Subscript } from './subscript.js';
 import { Superscript } from './superscript.js';
 import { Table, type TableOptions } from './table.js';
+import { TableCell, TableHeader } from './table-cell.js';
 import { TextStyle } from './text-style.js';
 import { Youtube } from './youtube.js';
 
@@ -26,7 +27,7 @@ type Part<Options> = Partial<Options> | false;
 
 export interface TiptapEssentialsOptions {
   starterKit: Part<StarterKitOptions>;
-  /** TableKit's options, its table being the library's. */
+  /** TableKit's options, its table, cell and header being the library's. */
   tableKit:
     | (Partial<Omit<TableKitOptions, 'table'>> & { table?: Part<TableOptions> })
     | false;
@@ -100,10 +101,28 @@ export const TiptapEssentials = Extension.create<TiptapEssentialsOptions>({
     }
 
     if (tableKit !== false) {
-      const { table = {}, ...rest } = tableKit;
-      extensions.push(TableKit.configure({ ...rest, table: false }));
+      const {
+        table = {},
+        tableCell = {},
+        tableHeader = {},
+        ...rest
+      } = tableKit;
+      extensions.push(
+        TableKit.configure({
+          ...rest,
+          table: false,
+          tableCell: false,
+          tableHeader: false
+        })
+      );
       if (table !== false) {
         extensions.push(Table.configure(table));
+      }
+      if (tableCell !== false) {
+        extensions.push(TableCell.configure(tableCell));
+      }
+      if (tableHeader !== false) {
+        extensions.push(TableHeader.configure(tableHeader));
       }
     }
 

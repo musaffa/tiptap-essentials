@@ -21,5 +21,7 @@ export { Subscript } from './subscript.js';
 export { Superscript } from './superscript.js';
 export { Table } from './table.js';
 export type { TableOptions } from './table.js';
+export { TableCell, TableHeader } from './table-cell.js';
+export { columnShares } from './table-sizing.js';
 export { TextStyle } from './text-style.js';
 export { Youtube } from './youtube.js';

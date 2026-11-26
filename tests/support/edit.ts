@@ -10,7 +10,12 @@ import { TiptapEssentials } from '../../src/tiptap-essentials.js';
 export function edit(
   content: string,
   extension: AnyExtension = TiptapEssentials.configure({
-    tableKit: { table: { region: 'Table' } },
+    tableKit: {
+      table: {
+        region: 'Table',
+        cellColors: ['var(--tiptap-highlight-yellow)']
+      }
+    },
     textStyleKit: {
       fontSize: { fontSizes: ['var(--lg-font-size)'] },
       color: { colors: ['var(--tiptap-text-red)'] },
