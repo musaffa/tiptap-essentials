@@ -71,7 +71,7 @@ export const TiptapEssentials = Extension.create<TiptapEssentialsOptions>({
       tableKit: {},
       textStyleKit: {},
       textAlign: {
-        types: ['heading', 'paragraph'],
+        types: ['heading', 'paragraph', 'figcaption'],
         alignments: ['start', 'end', 'left', 'center', 'right', 'justify']
       },
       highlight: {},

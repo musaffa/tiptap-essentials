@@ -65,6 +65,15 @@ describe('figure', () => {
     }
   });
 
+  test("reads a caption's alignment back and writes it out as it came", () => {
+    const aligned = figure.replace(
+      '<figcaption>',
+      '<figcaption style="text-align: center;">'
+    );
+
+    expect(edit(aligned).getHTML()).toBe(aligned);
+  });
+
   test("reads another site's figure of one image, its figcaption as the caption", () => {
     const html = edit(
       `<figure class="wp-block-image"><img src="${SRC}" alt="Boats" style="width: 60%">` +
@@ -156,14 +165,6 @@ describe('figure', () => {
 
     editor.commands.setFigureCredit('   ');
     expect(editor.getHTML()).not.toContain('tiptap-figure-credit');
-  });
-
-  test('describes the image by its caption where its alt is set empty', () => {
-    const editor = inCaption(edit(figure));
-
-    editor.commands.setFigureAlt('');
-
-    expect(editor.getHTML()).toContain('alt="The harbour at dawn"');
   });
 
   test("swaps the image, keeping the figure's caption and layout", () => {
@@ -260,6 +261,54 @@ describe('figure', () => {
     const credit = editor.view.dom.querySelector('.tiptap-figure-credit');
     expect(credit?.querySelector('img')).toBeNull();
     expect(credit?.textContent).toBe('<img src=x onerror="window.ran = true">');
+  });
+
+  test('selects the figure on Backspace at the start of its caption, and deletes it whole on the next', () => {
+    const editor = edit(`<p>Before</p>${figure}<p>After</p>`);
+    editor.state.doc.descendants((node, pos) => {
+      if (node.type.name === 'figcaption') {
+        editor.commands.setTextSelection(pos + 1);
+        return false;
+      }
+      return true;
+    });
+
+    const backspace = () =>
+      editor.view.someProp('handleKeyDown', (handle) =>
+        handle(editor.view, new KeyboardEvent('keydown', { key: 'Backspace' }))
+      );
+
+    backspace();
+    expect(editor.getHTML()).toBe(`<p>Before</p>${figure}<p>After</p>`);
+    expect(editor.state.selection).toBeInstanceOf(NodeSelection);
+
+    backspace();
+    expect(editor.getHTML()).not.toContain('figure');
+  });
+
+  test('removes a figure whose picture an edit takes away, its caption and credit with it', () => {
+    const editor = edit(`<p>Before</p>${figure}<p>After</p>`);
+    let picture = -1;
+    editor.state.doc.descendants((node, pos) => {
+      if (node.type.name === 'figureImage') {
+        picture = pos;
+      }
+      return picture < 0;
+    });
+
+    editor.commands.deleteRange({ from: picture, to: picture + 1 });
+
+    expect(editor.getHTML()).toBe('<p>Before</p><p>After</p>');
+  });
+
+  test("draws a caption's alignment", () => {
+    const editor = inCaption(edit(figure));
+
+    editor.commands.setTextAlign('end');
+
+    expect(
+      editor.view.dom.querySelector<HTMLElement>('figcaption')?.style.textAlign
+    ).toBe('end');
   });
 
   test('marks the figure selected or holding the cursor, and an empty caption', () => {

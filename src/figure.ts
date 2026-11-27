@@ -45,8 +45,9 @@ const FLOATED_WIDTH = 50;
 export interface FigureOptions {
   /**
    * The widths a centre, left or right figure may take, in percent of its
-   * column: its handles and `setFigureWidth` stop at the nearest. One at 100
-   * writes no width, taking its column's, and stands at its centre.
+   * column: its handles, held between the narrowest and the widest while
+   * dragged, and `setFigureWidth` stop at the nearest. One at 100 writes no
+   * width, taking its column's, and stands at its centre.
    */
   widths: number[];
 
@@ -83,11 +84,6 @@ declare module '@tiptap/core' {
       /** Credits the figure's image. A credit of spaces alone takes it off. */
       setFigureCredit: (credit: string) => ReturnType;
       unsetFigureCredit: () => ReturnType;
-      /**
-       * Describes the figure's image. A description of spaces alone describes
-       * it by its caption instead, where it has one.
-       */
-      setFigureAlt: (alt: string) => ReturnType;
       /** Swaps the figure's image, keeping its caption and its layout. */
       setFigureImage: (image: ImageAttributes) => ReturnType;
     };
@@ -210,6 +206,26 @@ export const Figure = Node.create<FigureOptions>({
         }
       };
 
+      // The width of the column the figure stands in, which its share is of:
+      // none where it stands in none, or in one drawn without a width.
+      const columnWidth = () => {
+        const column = resizable.container.parentElement;
+
+        if (!column) {
+          return null;
+        }
+
+        const style = getComputedStyle(column);
+        const width =
+          column.clientWidth -
+          parseFloat(style.paddingLeft) -
+          parseFloat(style.paddingRight);
+
+        return width > 0 ? width : null;
+      };
+      const narrowest = Math.min(...this.options.widths);
+      const widest = Math.max(...this.options.widths);
+
       const resizable = new ResizableNodeView({
         element,
         contentElement: element,
@@ -217,31 +233,36 @@ export const Figure = Node.create<FigureOptions>({
         editor,
         getPos,
         // Drawn on the figure itself, which the text wraps, rather than on
-        // what it holds.
+        // what it holds, and held between the narrowest and the widest of
+        // the steps it is committed at.
         onResize: (width) => {
+          const column = columnWidth();
+          const held =
+            column === null
+              ? width
+              : Math.min(
+                  Math.max(width, (column * narrowest) / 100),
+                  (column * widest) / 100
+                );
+
           element.style.removeProperty('width');
           element.style.removeProperty('height');
-          resizable.container.style.width = `${width}px`;
+          resizable.container.style.width = `${held}px`;
         },
         onCommit: (width) => {
           const pos = getPos();
-          const column = resizable.container.parentElement;
+          const column = columnWidth();
 
           if (
             pos === undefined ||
-            !column ||
+            column === null ||
             !SIZED.includes(drawn.attrs['layout'] as FigureLayout)
           ) {
             draw(drawn);
             return;
           }
 
-          const style = getComputedStyle(column);
-          const share =
-            (100 * width) /
-            (column.clientWidth -
-              parseFloat(style.paddingLeft) -
-              parseFloat(style.paddingRight));
+          const share = (100 * width) / column;
 
           editor.view.dispatch(
             editor.state.tr.setNodeMarkup(pos, undefined, {
@@ -271,12 +292,36 @@ export const Figure = Node.create<FigureOptions>({
       element.style.removeProperty('width');
       draw(node);
 
+      // The picture's height, which the handles' bars are centred on rather
+      // than on the picture and its caption together, measured again as the
+      // figure is resized, its picture loads or is replaced, or its caption
+      // wraps.
+      const setPictureHeight = () => {
+        const picture = element.firstElementChild as HTMLElement | null;
+
+        if (picture) {
+          resizable.container.style.setProperty(
+            '--tiptap-figure-picture-height',
+            `${picture.offsetHeight}px`
+          );
+        } else {
+          resizable.container.style.removeProperty(
+            '--tiptap-figure-picture-height'
+          );
+        }
+      };
+      const observer = new ResizeObserver(setPictureHeight);
+      observer.observe(element);
+
       return {
         dom: resizable.dom,
         contentDOM: resizable.contentDOM,
         update: (updated, decorations, innerDecorations) =>
           resizable.update(updated, decorations, innerDecorations),
-        destroy: () => resizable.destroy(),
+        destroy: () => {
+          observer.disconnect();
+          resizable.destroy();
+        },
         // A drag redraws the figure's size and its handles' state as it goes,
         // which are none of the text's: taken as a change to the document,
         // they would redraw the figure and end the drag.
@@ -317,10 +362,7 @@ export const Figure = Node.create<FigureOptions>({
     const changeChild =
       (
         index: 0 | 1,
-        attributes: (
-          child: ProseMirrorNode,
-          figure: ProseMirrorNode
-        ) => Record<string, unknown>
+        attributes: (child: ProseMirrorNode) => Record<string, unknown>
       ) =>
       ({ tr, dispatch }: CommandProps) => {
         const figure = figureAt(tr.selection);
@@ -336,7 +378,7 @@ export const Figure = Node.create<FigureOptions>({
 
           tr.setNodeMarkup(pos, undefined, {
             ...child.attrs,
-            ...attributes(child, figure.node)
+            ...attributes(child)
           });
         }
 
@@ -399,12 +441,6 @@ export const Figure = Node.create<FigureOptions>({
 
       unsetFigureCredit: () => changeChild(1, () => ({ credit: null })),
 
-      setFigureAlt: (alt) =>
-        changeChild(0, (image, figure) => ({
-          alt:
-            alt.trim() || figure.child(1).textContent.trim() || image.attrs['alt']
-        })),
-
       // Every attribute the new image is not given goes back to none, rather
       // than keeping the old image's.
       setFigureImage: (image) =>
@@ -430,6 +466,23 @@ export const Figure = Node.create<FigureOptions>({
           .setTextSelection(after + 1)
           .scrollIntoView()
           .run();
+      },
+
+      // Backspace at a caption's start selects its figure, which the next
+      // deletes whole, rather than deleting the picture before the caption,
+      // which the figure would take back empty.
+      Backspace: ({ editor }) => {
+        const { $from, empty } = editor.state.selection;
+
+        if (
+          !empty ||
+          $from.parent.type.name !== 'figcaption' ||
+          $from.parentOffset > 0
+        ) {
+          return false;
+        }
+
+        return editor.commands.setNodeSelection($from.before($from.depth - 1));
       }
     };
   },
@@ -454,6 +507,35 @@ export const Figure = Node.create<FigureOptions>({
                 ])
               : null;
           }
+        }
+      }),
+      new Plugin({
+        key: new PluginKey('figureWithoutPicture'),
+        // A figure whose picture an edit took away, which the figure takes
+        // back without an image, goes whole rather than leaving its caption
+        // and its credit behind. A figure stands only at the body's level.
+        appendTransaction: (transactions, _old, state) => {
+          if (!transactions.some((transaction) => transaction.docChanged)) {
+            return null;
+          }
+
+          const emptied: { from: number; to: number }[] = [];
+          state.doc.forEach((node, offset) => {
+            if (node.type.name === this.name && !node.child(0).attrs['src']) {
+              emptied.push({ from: offset, to: offset + node.nodeSize });
+            }
+          });
+
+          if (emptied.length === 0) {
+            return null;
+          }
+
+          // From the last, so that each figure still stands where it was found.
+          const tr = state.tr;
+          for (const { from, to } of emptied.reverse()) {
+            tr.delete(from, to);
+          }
+          return tr;
         }
       })
     ];
@@ -548,12 +630,13 @@ export const Figcaption = Node.create({
     ];
   },
 
-  renderHTML({ node }) {
+  renderHTML({ node, HTMLAttributes }) {
     const credit = node.attrs['credit'] as string | null;
     const captioned = node.content.size > 0;
 
     return [
       'figcaption',
+      HTMLAttributes,
       ...(captioned ? [['span', { class: 'tiptap-figure-caption' }, 0]] : []),
       ...(captioned && credit ? [' '] : []),
       ...(credit ? [['span', { class: 'tiptap-figure-credit' }, credit]] : [])
@@ -574,6 +657,8 @@ export const Figcaption = Node.create({
           'tiptap-figure-caption-empty',
           shown.content.size === 0
         );
+        // Its alignment, where the text's reaches captions, as the page has it.
+        dom.style.textAlign = (shown.attrs['textAlign'] as string | null) ?? '';
 
         const text = shown.attrs['credit'] as string | null;
         if (text) {
