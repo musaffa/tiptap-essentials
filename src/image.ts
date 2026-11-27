@@ -175,7 +175,11 @@ function addressesOf(element: HTMLElement) {
   return [img?.getAttribute('src') ?? '', ...srcsetUrls].filter(Boolean);
 }
 
-function isFromHost(element: HTMLElement, host: string | null) {
+/**
+ * Whether every address an image, or the picture holding it, is fetched from
+ * is on the host. Any is, where there is no host.
+ */
+export function isFromHost(element: HTMLElement, host: string | null) {
   return (
     host === null ||
     addressesOf(element).every((address) => address.startsWith(`${host}/`))

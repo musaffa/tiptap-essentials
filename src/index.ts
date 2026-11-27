@@ -4,6 +4,13 @@ export { BlockSpacing } from './block-spacing.js';
 export type { BlockSpacingOptions } from './block-spacing.js';
 export { Color } from './color.js';
 export type { ColorOptions } from './color.js';
+export { Document } from './document.js';
+export { Figcaption, Figure, FigureImage } from './figure.js';
+export type {
+  FigureAttributes,
+  FigureLayout,
+  FigureOptions
+} from './figure.js';
 export { FontSize } from './font-size.js';
 export type { FontSizeOptions } from './font-size.js';
 export { Highlight } from './highlight.js';

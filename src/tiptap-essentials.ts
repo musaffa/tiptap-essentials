@@ -11,6 +11,8 @@ import type { YoutubeOptions } from '@tiptap/extension-youtube';
 import StarterKit, { type StarterKitOptions } from '@tiptap/starter-kit';
 import { BlockSpacing, type BlockSpacingOptions } from './block-spacing.js';
 import { Color, type ColorOptions } from './color.js';
+import { Document } from './document.js';
+import { Figure, type FigureOptions } from './figure.js';
 import { FontSize, type FontSizeOptions } from './font-size.js';
 import { Highlight, type HighlightOptions } from './highlight.js';
 import { Image, type ImageOptions } from './image.js';
@@ -50,6 +52,8 @@ export interface TiptapEssentialsOptions {
   superscript: Part<SuperscriptExtensionOptions>;
   subscript: Part<SubscriptExtensionOptions>;
   image: Part<ImageOptions>;
+  /** The figure's options, its `host` the image's unless given. */
+  figure: Part<FigureOptions>;
   youtube: Part<YoutubeOptions>;
   plainSpaces: Record<string, never> | false;
 }
@@ -75,6 +79,7 @@ export const TiptapEssentials = Extension.create<TiptapEssentialsOptions>({
       superscript: {},
       subscript: {},
       image: {},
+      figure: {},
       youtube: {},
       plainSpaces: {}
     };
@@ -91,13 +96,25 @@ export const TiptapEssentials = Extension.create<TiptapEssentialsOptions>({
       superscript,
       subscript,
       image,
+      figure,
       youtube,
       plainSpaces
     } = this.options;
     const extensions: AnyExtension[] = [];
+    // A figure needs a document that holds it, which StarterKit's does not.
+    const holdsFigures =
+      figure !== false && starterKit !== false && starterKit.document !== false;
 
     if (starterKit !== false) {
-      extensions.push(StarterKit.configure(starterKit));
+      extensions.push(
+        StarterKit.configure(
+          holdsFigures ? { ...starterKit, document: false } : starterKit
+        )
+      );
+    }
+
+    if (holdsFigures) {
+      extensions.push(Document);
     }
 
     if (tableKit !== false) {
@@ -179,6 +196,15 @@ export const TiptapEssentials = Extension.create<TiptapEssentialsOptions>({
 
     if (image !== false) {
       extensions.push(Image.configure(image));
+    }
+
+    if (figure !== false) {
+      extensions.push(
+        Figure.configure({
+          host: image === false ? null : (image.host ?? null),
+          ...figure
+        })
+      );
     }
 
     if (youtube !== false) {

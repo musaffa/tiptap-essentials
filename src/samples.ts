@@ -6,9 +6,36 @@
 
 export const picture =
   '<picture><source type="image/jxl" srcset="https://static.example/uploads/store/photo-300.jxl 300w" sizes="auto">' +
-  '<img src="https://static.example/uploads/store/photo-1200.jpg" alt="A harbour" title="A harbour" ' +
-  'srcset="https://static.example/uploads/store/photo-300.jpg 300w" sizes="auto" loading="lazy" ' +
-  'style="width: 100%; aspect-ratio: 3 / 2;"></picture>';
+  '<img src="https://static.example/uploads/store/photo-1200.jpg" alt="A harbour" width="1200" height="800" ' +
+  'srcset="https://static.example/uploads/store/photo-300.jpg 300w" sizes="auto" loading="lazy"></picture>';
+
+// A photo as a figure holds it.
+const photo = (alt: string) =>
+  '<picture><source type="image/jxl" srcset="https://static.example/uploads/store/photo-300.jxl 300w" sizes="auto">' +
+  `<img src="https://static.example/uploads/store/photo-1200.jpg" alt="${alt}" width="1200" height="800" ` +
+  'srcset="https://static.example/uploads/store/photo-300.jpg 300w" sizes="auto" loading="lazy"></picture>';
+
+export const figure =
+  `<figure class="tiptap-figure tiptap-align-center">${photo('Fishing boats moored at a pier')}` +
+  '<figcaption><span class="tiptap-figure-caption">The harbour at dawn</span> ' +
+  '<span class="tiptap-figure-credit">Jane Doe</span></figcaption></figure>';
+
+export const leftFigure =
+  '<figure class="tiptap-figure tiptap-align-left" style="--tiptap-figure-width: 50%;">' +
+  `${photo('Fishing boats moored at a pier')}` +
+  '<figcaption><span class="tiptap-figure-caption">The harbour at <em>dawn</em></span> ' +
+  '<span class="tiptap-figure-credit">Jane Doe</span></figcaption></figure>';
+
+export const rightFigure =
+  '<figure class="tiptap-figure tiptap-align-right" style="--tiptap-figure-width: 33%;">' +
+  `${photo('Fishing boats moored at a pier')}` +
+  '<figcaption><span class="tiptap-figure-caption">The harbour at dawn</span></figcaption></figure>';
+
+export const wideFigure =
+  `<figure class="tiptap-figure tiptap-align-wide">${photo('Fishing boats moored at a pier')}` +
+  '<figcaption><span class="tiptap-figure-credit">Jane Doe</span></figcaption></figure>';
+
+export const fullFigure = `<figure class="tiptap-figure tiptap-align-full">${photo('Fishing boats moored at a pier')}</figure>`;
 
 // A table no line has moved, its columns at even shares.
 export const table =
