@@ -14,6 +14,7 @@ import { Color, type ColorOptions } from './color.js';
 import { Document } from './document.js';
 import { Figure, type FigureOptions } from './figure.js';
 import { FontSize, type FontSizeOptions } from './font-size.js';
+import { Gallery, type GalleryOptions } from './gallery.js';
 import { Highlight, type HighlightOptions } from './highlight.js';
 import { Image, type ImageOptions } from './image.js';
 import { LineHeight, type LineHeightOptions } from './line-height.js';
@@ -54,6 +55,11 @@ export interface TiptapEssentialsOptions {
   image: Part<ImageOptions>;
   /** The figure's options, its `host` the image's unless given. */
   figure: Part<FigureOptions>;
+  /**
+   * The gallery's options, its `host` the image's unless given. A gallery
+   * goes only with the figure, which one left with a single image becomes.
+   */
+  gallery: Part<GalleryOptions>;
   youtube: Part<YoutubeOptions>;
   plainSpaces: Record<string, never> | false;
 }
@@ -80,6 +86,7 @@ export const TiptapEssentials = Extension.create<TiptapEssentialsOptions>({
       subscript: {},
       image: {},
       figure: {},
+      gallery: {},
       youtube: {},
       plainSpaces: {}
     };
@@ -97,6 +104,7 @@ export const TiptapEssentials = Extension.create<TiptapEssentialsOptions>({
       subscript,
       image,
       figure,
+      gallery,
       youtube,
       plainSpaces
     } = this.options;
@@ -203,6 +211,15 @@ export const TiptapEssentials = Extension.create<TiptapEssentialsOptions>({
         Figure.configure({
           host: image === false ? null : (image.host ?? null),
           ...figure
+        })
+      );
+    }
+
+    if (figure !== false && gallery !== false) {
+      extensions.push(
+        Gallery.configure({
+          host: image === false ? null : (image.host ?? null),
+          ...gallery
         })
       );
     }

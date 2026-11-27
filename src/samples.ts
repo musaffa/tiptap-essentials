@@ -37,6 +37,43 @@ export const wideFigure =
 
 export const fullFigure = `<figure class="tiptap-figure tiptap-align-full">${photo('Fishing boats moored at a pier')}</figure>`;
 
+// A photo as a gallery holds it: its shape, its width over its height, and
+// its credit where it has one.
+const galleryPhoto = (
+  alt: string,
+  [width, height, ratio]: [number, number, string],
+  credit?: string
+) =>
+  `<picture style="--tiptap-ratio: ${ratio};"${credit ? ` data-credit="${credit}"` : ''}>` +
+  '<source type="image/jxl" srcset="https://static.example/uploads/store/photo-300.jxl 300w" sizes="auto">' +
+  `<img src="https://static.example/uploads/store/photo-1200.jpg" alt="${alt}" width="${width}" height="${height}" ` +
+  'srcset="https://static.example/uploads/store/photo-300.jpg 300w" sizes="auto" loading="lazy"></picture>';
+
+const LANDSCAPE: [number, number, string] = [1200, 800, '1.5'];
+const PORTRAIT: [number, number, string] = [800, 1200, '0.6667'];
+const SQUARE: [number, number, string] = [1000, 1000, '1'];
+
+// Its caption followed by its images' credits, each once.
+export const gallery =
+  '<figure class="tiptap-gallery"><div class="tiptap-gallery-images">' +
+  galleryPhoto('Fishing boats moored at a pier', LANDSCAPE, 'Jane Doe') +
+  galleryPhoto('A lighthouse above the harbour', PORTRAIT, 'John Roe') +
+  galleryPhoto('Nets drying on the quay', SQUARE, 'Jane Doe') +
+  '</div><figcaption><span class="tiptap-figure-caption">The harbour at dawn</span> ' +
+  '<span class="tiptap-figure-credit">Jane Doe; John Roe</span></figcaption></figure>';
+
+export const wideGallery =
+  '<figure class="tiptap-gallery tiptap-align-wide"><div class="tiptap-gallery-images">' +
+  galleryPhoto('Fishing boats moored at a pier', LANDSCAPE) +
+  galleryPhoto('A lighthouse above the harbour', PORTRAIT) +
+  '</div><figcaption><span class="tiptap-figure-caption">The harbour at dawn</span></figcaption></figure>';
+
+export const fullGallery =
+  '<figure class="tiptap-gallery tiptap-align-full"><div class="tiptap-gallery-images">' +
+  galleryPhoto('Fishing boats moored at a pier', LANDSCAPE, 'Jane Doe') +
+  galleryPhoto('Nets drying on the quay', SQUARE) +
+  '</div><figcaption><span class="tiptap-figure-credit">Jane Doe</span></figcaption></figure>';
+
 // A table no line has moved, its columns at even shares.
 export const table =
   '<div class="table-responsive" role="region" tabindex="0" aria-label="Table">' +

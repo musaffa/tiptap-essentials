@@ -286,6 +286,15 @@ describe('figure', () => {
     expect(editor.getHTML()).not.toContain('figure');
   });
 
+  test('deletes the figure selected or holding the cursor', () => {
+    for (const choose of [selectFigure, inCaption]) {
+      const editor = choose(edit(`<p>Before</p>${figure}<p>After</p>`));
+
+      expect(editor.commands.deleteFigure()).toBe(true);
+      expect(editor.getHTML()).toBe('<p>Before</p><p>After</p>');
+    }
+  });
+
   test('removes a figure whose picture an edit takes away, its caption and credit with it', () => {
     const editor = edit(`<p>Before</p>${figure}<p>After</p>`);
     let picture = -1;

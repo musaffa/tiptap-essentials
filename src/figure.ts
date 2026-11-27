@@ -86,6 +86,8 @@ declare module '@tiptap/core' {
       unsetFigureCredit: () => ReturnType;
       /** Swaps the figure's image, keeping its caption and its layout. */
       setFigureImage: (image: ImageAttributes) => ReturnType;
+      /** Deletes the figure selected or holding the cursor. */
+      deleteFigure: () => ReturnType;
     };
   }
 }
@@ -444,13 +446,33 @@ export const Figure = Node.create<FigureOptions>({
       // Every attribute the new image is not given goes back to none, rather
       // than keeping the old image's.
       setFigureImage: (image) =>
-        changeChild(0, (old) => old.type.create(image).attrs)
+        changeChild(0, (old) => old.type.create(image).attrs),
+
+      // Tiptap's deleteNode looks only at the nodes holding the cursor, never
+      // at a figure selected whole.
+      deleteFigure:
+        () =>
+        ({ tr, dispatch }) => {
+          const figure = figureAt(tr.selection);
+
+          if (!figure) {
+            return false;
+          }
+
+          if (dispatch) {
+            tr.delete(figure.pos, figure.pos + figure.node.nodeSize);
+            tr.scrollIntoView();
+          }
+
+          return true;
+        }
     };
   },
 
   addKeyboardShortcuts() {
     return {
-      // A caption is one line: Enter goes on to a paragraph after its figure.
+      // A caption is one line: Enter goes on to a paragraph after what it
+      // captions, a figure or a gallery.
       Enter: ({ editor }) => {
         const { $from } = editor.state.selection;
 
@@ -468,9 +490,9 @@ export const Figure = Node.create<FigureOptions>({
           .run();
       },
 
-      // Backspace at a caption's start selects its figure, which the next
-      // deletes whole, rather than deleting the picture before the caption,
-      // which the figure would take back empty.
+      // Backspace at a caption's start selects what it captions, a figure or
+      // a gallery, which the next deletes whole, rather than deleting the
+      // picture before the caption, which a figure would take back empty.
       Backspace: ({ editor }) => {
         const { $from, empty } = editor.state.selection;
 
@@ -587,10 +609,10 @@ export const FigureImage = Image.extend({
 });
 
 /**
- * A figure's caption and its credit, as `<figcaption>`: the caption is its
- * text, written in place, and the credit, read from a photo rather than
- * written per article, an attribute drawn after it. A figure leaves out one
- * with neither.
+ * A figure's or a gallery's caption and its credit, as `<figcaption>`: the
+ * caption is its text, written in place, and the credit, read from a photo
+ * rather than written per article, an attribute drawn after it, a gallery's
+ * the credits of its images. Either leaves out one with neither.
  */
 export const Figcaption = Node.create({
   name: 'figcaption',
@@ -615,7 +637,7 @@ export const Figcaption = Node.create({
     return [
       {
         tag: 'figcaption',
-        context: 'figure/',
+        context: 'figure/|gallery/',
         // Another site's figcaption is a caption whole.
         contentElement: (element) =>
           (element as HTMLElement).querySelector<HTMLElement>(
@@ -692,7 +714,7 @@ export const Figcaption = Node.create({
 });
 
 // The figure selected, or holding the cursor.
-function figureAt(selection: Selection) {
+export function figureAt(selection: Selection) {
   if (
     selection instanceof NodeSelection &&
     selection.node.type.name === 'figure'
@@ -703,9 +725,9 @@ function figureAt(selection: Selection) {
   return findParentNode((node) => node.type.name === 'figure')(selection) ?? null;
 }
 
-// Where a figure goes in other than at the cursor: after a block selected
-// whole, or after the table, list or quote the cursor is in.
-function placeAfter(selection: Selection) {
+// Where a figure or a gallery goes in other than at the cursor: after a block
+// selected whole, or after the table, list or quote the cursor is in.
+export function placeAfter(selection: Selection) {
   if (selection instanceof NodeSelection) {
     return selection.$from.depth > 0 ? selection.$from.after(1) : selection.to;
   }
@@ -761,8 +783,8 @@ function attributesAtWidth(
   return { layout: floated && kept === null ? 'center' : layout, width: kept };
 }
 
-// A credit as a figure holds it: each run of spaces and line breaks one
-// space, none at either end, and spaces alone no credit.
-function creditText(text: string | null | undefined) {
+// A credit as a figure or a gallery's image holds it: each run of spaces and
+// line breaks one space, none at either end, and spaces alone no credit.
+export function creditText(text: string | null | undefined) {
   return text?.replace(/\s+/g, ' ').trim() || null;
 }

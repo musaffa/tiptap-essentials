@@ -12,6 +12,13 @@ export type {
   FigureOptions
 } from './figure.js';
 export { FontSize } from './font-size.js';
+export { Gallery, GalleryImage, GalleryImages } from './gallery.js';
+export type {
+  GalleryAttributes,
+  GalleryImageAttributes,
+  GalleryLayout,
+  GalleryOptions
+} from './gallery.js';
 export type { FontSizeOptions } from './font-size.js';
 export { Highlight } from './highlight.js';
 export type { HighlightOptions } from './highlight.js';
