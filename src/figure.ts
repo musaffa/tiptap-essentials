@@ -46,7 +46,7 @@ export interface FigureOptions {
   /**
    * The widths a centre, left or right figure may take, in percent of its
    * column: its handles and `setFigureWidth` stop at the nearest. One at 100
-   * writes no width, taking its column's.
+   * writes no width, taking its column's, and stands at its centre.
    */
   widths: number[];
 
@@ -75,7 +75,10 @@ declare module '@tiptap/core' {
        * wide as its column set to one side is narrowed to half of it.
        */
       setFigureLayout: (layout: FigureLayout) => ReturnType;
-      /** Sizes the figure at the step of its `widths` nearest `width`. */
+      /**
+       * Sizes the figure at the step of its `widths` nearest `width`. One at
+       * one side sized to its column's whole width moves to its centre.
+       */
       setFigureWidth: (width: number) => ReturnType;
       /** Credits the figure's image. A credit of spaces alone takes it off. */
       setFigureCredit: (credit: string) => ReturnType;
@@ -243,7 +246,11 @@ export const Figure = Node.create<FigureOptions>({
           editor.view.dispatch(
             editor.state.tr.setNodeMarkup(pos, undefined, {
               ...drawn.attrs,
-              width: keptWidth(share, this.options.widths)
+              ...attributesAtWidth(
+                drawn.attrs['layout'] as FigureLayout,
+                share,
+                this.options.widths
+              )
             })
           );
           draw(drawn);
@@ -379,11 +386,13 @@ export const Figure = Node.create<FigureOptions>({
         }),
 
       setFigureWidth: (width) =>
-        change((figure) =>
-          SIZED.includes(figure.attrs['layout'] as FigureLayout)
-            ? { width: keptWidth(width, widths) }
-            : null
-        ),
+        change((figure) => {
+          const layout = figure.attrs['layout'] as FigureLayout;
+
+          return SIZED.includes(layout)
+            ? attributesAtWidth(layout, width, widths)
+            : null;
+        }),
 
       setFigureCredit: (credit) =>
         changeChild(1, () => ({ credit: creditText(credit) })),
@@ -651,6 +660,20 @@ function keptWidth(width: number, widths: number[]) {
   );
 
   return step >= 100 ? null : step;
+}
+
+// A sized figure's layout and width as it is sized to a width. One at one side
+// sized to its column's whole width would leave the text no room beside it,
+// and moves to the centre.
+function attributesAtWidth(
+  layout: FigureLayout,
+  width: number,
+  widths: number[]
+) {
+  const kept = keptWidth(width, widths);
+  const floated = layout === 'left' || layout === 'right';
+
+  return { layout: floated && kept === null ? 'center' : layout, width: kept };
 }
 
 // A credit as a figure holds it: each run of spaces and line breaks one

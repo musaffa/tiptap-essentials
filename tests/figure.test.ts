@@ -124,6 +124,18 @@ describe('figure', () => {
     });
   });
 
+  test('moves a figure at one side sized to its whole column to the centre', () => {
+    for (const sample of [leftFigure, rightFigure]) {
+      const editor = selectFigure(edit(sample));
+
+      editor.commands.setFigureWidth(90);
+      expect(figureAttributes(editor)).toMatchObject({
+        layout: 'center',
+        width: null
+      });
+    }
+  });
+
   test('takes no width wide or full', () => {
     const editor = selectFigure(edit(leftFigure));
 
