@@ -121,7 +121,7 @@ describe('gallery', () => {
     expect(editor.commands.moveGalleryImageTo(3)).toBe(false);
   });
 
-  test('becomes a figure of its image left, keeping its caption, layout and credit', () => {
+  test('becomes a figure of its image left, keeping its caption, layout and credit, its alt emptied', () => {
     const column = edit('<p>Text</p>');
     column.commands.insertGallery({
       images: [image('Boats', 'Jane Doe'), image('Pier', 'John Roe')],
@@ -131,7 +131,7 @@ describe('gallery', () => {
 
     expect(column.getHTML()).toContain(
       '<figure class="tiptap-figure tiptap-align-center">' +
-        `<img src="${SRC}" alt="Pier" width="1200" height="800">` +
+        `<img src="${SRC}" alt="" width="1200" height="800">` +
         '<figcaption><span class="tiptap-figure-caption">The harbour</span> ' +
         '<span class="tiptap-figure-credit">John Roe</span></figcaption></figure>'
     );
@@ -171,6 +171,15 @@ describe('gallery', () => {
         Array.from({ length: 10 }, (_, at) => image(`${at}`))
       )
     ).toBe(false);
+  });
+
+  test("gives a figure's image with an empty alt the caption's words as it grows into a gallery", () => {
+    const editor = edit(leftFigure.replace(/alt="[^"]*"/, 'alt=""'));
+    editor.commands.focus('start');
+
+    editor.commands.addGalleryImages([image('Pier')]);
+
+    expect(alts(editor)).toEqual(['The harbour at dawn', 'Pier']);
   });
 
   test('writes a shape past either bound at the bound', () => {

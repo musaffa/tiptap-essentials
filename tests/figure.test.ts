@@ -65,6 +65,12 @@ describe('figure', () => {
     }
   });
 
+  test('reads a picture with an empty alt back and writes it out as it came', () => {
+    const described = figure.replace(/alt="[^"]*"/, 'alt=""');
+
+    expect(edit(described).getHTML()).toBe(described);
+  });
+
   test("reads a caption's alignment back and writes it out as it came", () => {
     const aligned = figure.replace(
       '<figcaption>',

@@ -790,7 +790,9 @@ function classesOf(layout: GalleryLayout) {
 
 // A figure grown into a gallery: its image first, with its credit, then the
 // images added, under its caption; wide and full as they were, and any other
-// layout across the column, a gallery taking no share of it.
+// layout across the column, a gallery taking no share of it. An image with an
+// empty alt was described by the caption, which now describes the whole
+// gallery, so the caption's words become its alt.
 function galleryOfFigure(
   figure: ProseMirrorNode,
   added: ProseMirrorNode[],
@@ -806,6 +808,7 @@ function galleryOfFigure(
       schema.nodes['galleryImages']!.create(null, [
         schema.nodes['galleryImage']!.create({
           ...image.attrs,
+          alt: image.attrs['alt'] || caption.textContent,
           credit: caption.attrs['credit']
         }),
         ...added
@@ -817,7 +820,8 @@ function galleryOfFigure(
 
 // A gallery left with one image as the figure of it: its caption kept, the
 // image's credit the figure's, wide and full as they were, and the column
-// the centre.
+// the centre. Its alt is emptied, as a figure's caption is its picture's
+// description.
 function figureOfGallery(gallery: ProseMirrorNode, schema: Schema) {
   const image = gallery.child(0).child(0);
   const caption = gallery.child(1);
@@ -826,7 +830,7 @@ function figureOfGallery(gallery: ProseMirrorNode, schema: Schema) {
   return schema.nodes['figure']!.create(
     { layout: layout === 'column' ? 'center' : layout },
     [
-      schema.nodes['figureImage']!.create(image.attrs),
+      schema.nodes['figureImage']!.create({ ...image.attrs, alt: '' }),
       caption.type.create(
         { ...caption.attrs, credit: image.attrs['credit'] },
         caption.content
